@@ -1,2 +1,2 @@
-# netflix-binge-buddy
+# netflix-binge-bot
 A tool to keep Netflix playing

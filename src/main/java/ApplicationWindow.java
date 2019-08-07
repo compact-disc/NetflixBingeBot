@@ -34,6 +34,7 @@ import java.awt.Desktop;
 
 public class ApplicationWindow {
 
+	//All the variables for the window
 	private JFrame frmNetflixBingeBuddy;
 	private JLabel beginShowLabel, titleLabel, statusCurrent, statusLabel, browserInstruction;
 	private JButton launchBrowerBtn, startBingeBtn, quitBtn, helpBtn, stopBingeBtn, closeBrowserBtn;
@@ -44,10 +45,17 @@ public class ApplicationWindow {
 	gbc_launchBrowerBtn, gbc_beginShowLabel, gbc_startBingeBtn, gbc_stopBingeBtn, gbc_statusLabel, gbc_statusCurrent,
 	gbc_helpBtn, gbc_quitBtn, gbc_closeBrowserBtn;
 	
+	//Used for collecting the profile name
+	private String profileName;
+	
+	//Object for the flashing status window
 	private FlashingColors flashingColors;
 	
+	//Object declaration for the controller to be launched
 	private Controller browserController;
 	
+	//variable used to determine if the browser is currently running or not
+	//This is used to make sure that the program does not break while closing or trying to open multiple browsers
 	private int browserLaunched = 0;
 
 	//Launch the application
@@ -84,14 +92,21 @@ public class ApplicationWindow {
 	//Initialize the contents of the frame
 	private void initialize() {
 		
+		//Create a new object of the flashing colors inner class to allow the status to flash
 		flashingColors = new FlashingColors();
 		
+		//Create the JFrame with parameters
 		frmNetflixBingeBuddy = new JFrame();
-		frmNetflixBingeBuddy.setTitle("Netflix Binge Buddy");
 		frmNetflixBingeBuddy.setResizable(false);
+		frmNetflixBingeBuddy.setTitle("Netflix Binge Buddy");
 		frmNetflixBingeBuddy.setBounds(100, 100, 365, 410);
+		
+		//Set the default close operation to do nothing--this is so a custom close operation can be created later
 		frmNetflixBingeBuddy.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
+		/*
+		 * Begin all of the window component creation and formatting
+		 */
 		gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] {35, 35, 35, 35, 0, 35};
 		gridBagLayout.rowHeights = new int[] {35, 35, 35, 35, 35};
@@ -233,6 +248,9 @@ public class ApplicationWindow {
 		gbc_quitBtn.gridx = 0;
 		gbc_quitBtn.gridy = 8;
 		frmNetflixBingeBuddy.getContentPane().add(quitBtn, gbc_quitBtn);
+		/*
+		 * End all of the window component building and formatting
+		 */
 		
 		/*
 		 * Start binge button action event
@@ -240,8 +258,15 @@ public class ApplicationWindow {
 		startBingeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				if(flashingColors.getStatus() == 0) {
+				//The colors are only allowed to be launched if the status is already 0 and if the browser is launched
+				if(flashingColors.getStatus() == 0 && browserLaunched == 1) {
+					
+					//Start the flashing colors
 					flashingColors.start();
+					
+					//Start the binge for any browser
+					browserController.startBinge();
+					
 				}
 				
 			}
@@ -253,7 +278,8 @@ public class ApplicationWindow {
 		stopBingeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				if(flashingColors.getStatus() == 1) {
+				//If the colors are flashing and the browser is launched then the flashing colors can be stopped
+				if(flashingColors.getStatus() == 1 && browserLaunched == 1) {
 					flashingColors.stop();
 				}
 				
@@ -266,6 +292,9 @@ public class ApplicationWindow {
 		launchBrowerBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				//If the profile name text field is not "Profile Name" and is not empty, and there is not another browser launched
+				//Then the browser is allowed to be launched
+				//Depending on which browser is chosen, the object of that browsers driver will be created and status = 1
 				if(!txtpnProfileName.getText().equals("Profile Name") && !txtpnProfileName.getText().isEmpty() && browserLaunched == 0) {
 				
 					if(browserSelector.getSelectedIndex() == 0) {
@@ -292,8 +321,13 @@ public class ApplicationWindow {
 		closeBrowserBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				browserLaunched = 0;
-				browserController.closeDriver();
+				//If a browser is launched and the button is clicked then the browser will close
+				if(browserLaunched == 1) {
+				
+					browserLaunched = 0;
+					browserController.closeDriver();
+				
+				}
 				
 			}
 		});
@@ -304,8 +338,10 @@ public class ApplicationWindow {
 		txtpnProfileName.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				
-				if(txtpnProfileName.getText().equals("Profile Name"))
+				//When user initially clicks on the profile name text field it will clear automatically
+				if(txtpnProfileName.getText().equals("Profile Name")) {
 					txtpnProfileName.setText("");
+				}
 				
 			}
 		});
@@ -316,6 +352,8 @@ public class ApplicationWindow {
 		helpBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				//Try-catch for opening the browser for the help section of the website, link to github page
+				//Driver not needed, this will just use the default browser of the system
 				try {
 					Desktop.getDesktop().browse(new URL("https://github.com/compact-disc/netflix-binge-buddy").toURI());
 				} catch (IOException | URISyntaxException e1) {
@@ -333,11 +371,13 @@ public class ApplicationWindow {
 		quitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				//Check if the browser is launched, then close it if it is
 				if(browserLaunched == 1) {
 					
 					browserController.closeDriver();
 				}
 				
+				//shutdown the java program
 				System.exit(0);
 				
 			}
@@ -349,11 +389,13 @@ public class ApplicationWindow {
 		frmNetflixBingeBuddy.addWindowListener(new WindowAdapter()  {
 			public void windowClosing(WindowEvent e){
 				
+				//If the browser is opened, then close it first before shutting down the entire program
 				if(browserLaunched == 1) {
 					
 					browserController.closeDriver();
 				}
 				
+				//Shutdown the main java program
 				System.exit(0);
 				
 			}
@@ -362,37 +404,60 @@ public class ApplicationWindow {
 		
 	}
 	
+	/*
+	 * Class to control the flashing color of the status in the program window
+	 */
 	class FlashingColors {
 		
+		//Create a timer
 		private Timer timer;
+		
+		//Create status for the running and current color of the flashing colors
 		private int currentColor = 0;
 		private int status = 0;
 		
+		//Getter for the status of the flashing colors
 		public int getStatus() {
 			return status;
 		}
 		
+		//Start the flashing colors
 		public void start() {
 			
+			//Create the timer object
 			this.timer = new Timer();
+			//Set the timer schedule for the flashing colors and then what to call
 			timer.schedule(new TimerCall(), 500, 500);
+			
+			//Set the text in the text field to RUNNING
 			statusCurrent.setText("Running");
+			//set the text field to background green
 			statusCurrent.setBackground(Color.GREEN);
+			
+			//set the status to 1--which is running, as in true
 			status = 1;
 			
 		}
 		
+		//Method to stop the flashing colors
 		public void stop(){
 			
+			//Stop the timer
 			timer.cancel();
+			
+			//Set the text to not running
 			statusCurrent.setText("Not Running");
+			//Set color to red
 			statusCurrent.setBackground(Color.RED);
+			//set the status to 0--which is false
 			status = 0;
 			
 		}
 		
+		//Method that will change the color with each interation
 		public void flashColor() {
 			
+			//Simple if-else-if to check which color is displayed, then change it to the opposite of it
 			if(currentColor == 0) {
 				statusCurrent.setBackground(Color.RED);
 				currentColor = 1;
@@ -403,11 +468,14 @@ public class ApplicationWindow {
 			
 		}
 		
+		//Inner class that is created for the timer to keep calling in the flashing colors inner class
 		class TimerCall extends TimerTask{
 
+			//Run method to be called whenever the timer hits another iteration
 			@Override
 			public void run() {
 				
+				//Call the flash color method every time the timer is called
 				flashColor();
 				
 			}

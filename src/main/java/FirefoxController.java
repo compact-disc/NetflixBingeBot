@@ -28,4 +28,16 @@ public class FirefoxController extends Controller {
 		
 	}
 
+	@Override
+	public void startBinge() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stopBinge() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
