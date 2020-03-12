@@ -8,6 +8,8 @@
 
 package main.java;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import java.util.Timer;
@@ -19,7 +21,11 @@ public class ChromeController extends Controller {
 	private ChromeOptions browserOptions;
 	private ChromeDriver chromeDriver;
 	
+	//Binge object that is created
 	private Binge binge;
+	
+	//Web element for the continue button
+	WebElement continueButton;
 	
 	//Default constructor for the chrome controller that will run on start
 	public ChromeController() {
@@ -102,6 +108,9 @@ public class ChromeController extends Controller {
 			//Set the running status of the binge to 1--true
 			bingeStatus = 1;
 			
+			//Continue button declaration when Binge() object is created
+			continueButton = chromeDriver.findElement(By.id(""));
+			
 		}
 		
 		//Method to stop the binge process, thus the timer
@@ -128,7 +137,10 @@ public class ChromeController extends Controller {
 			//Method called every time the timer is run
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
+				
+				/*
+				 * continueButton.click() method will be called here but we need a visible check added
+				 */
 				
 			}
 			

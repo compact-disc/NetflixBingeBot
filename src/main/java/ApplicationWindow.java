@@ -371,10 +371,25 @@ public class ApplicationWindow {
 		quitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				//Check if the browser is launched, then close it if it is
-				if(browserLaunched == 1) {
+				
+				//Try-catch to account for browser launch issue.
+				//It will still close the program even if there is no browser launched if it catches
+				//But will still close normally if it it does not catch
+				try {
+				
+					//Check if the browser is launched, then close it if it is
+					if(browserLaunched == 1) {
 					
-					browserController.closeDriver();
+						browserController.closeDriver();
+					}
+				
+				}catch (Exception ex) {
+					
+					//Print error, close program
+					
+					ex.printStackTrace();
+					System.exit(0);
+					
 				}
 				
 				//shutdown the java program
@@ -389,10 +404,24 @@ public class ApplicationWindow {
 		frmNetflixBingeBuddy.addWindowListener(new WindowAdapter()  {
 			public void windowClosing(WindowEvent e){
 				
-				//If the browser is opened, then close it first before shutting down the entire program
-				if(browserLaunched == 1) {
+				//Try-catch to account for browser launch issue.
+				//It will still close the program even if there is no browser launched if it catches
+				//But will still close normally if it it does not catch
+				try {
+				
+					//If the browser is opened, then close it first before shutting down the entire program
+					if(browserLaunched == 1) {
 					
-					browserController.closeDriver();
+						browserController.closeDriver();
+					
+					}
+				
+				}catch (Exception ex) {
+					
+					//Print error, close program
+					ex.printStackTrace();
+					System.exit(0);
+					
 				}
 				
 				//Shutdown the main java program
